@@ -11,23 +11,34 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import io.vertx.core.json.Json;
 import io.vertx.core.Launcher;
+import io.vertx.ext.web.handler.BodyHandler;
 public class MainVerticle extends AbstractVerticle {
 
   // Store our Dogs
-  private Map<Integer, Dogs> dogs = new LinkedHashMap<>();
+  private Map<Integer, Dogs> dogMapping = new LinkedHashMap<>();
   // Create some Dog
   private void createSomeData() {
     Dogs molly = new Dogs("Molly", "Cairn Terrier", 2);
-    dogs.put(molly.getId(), molly);
+    dogMapping.put(molly.getId(), molly);
 
     Dogs coco = new Dogs("Coco", "Golden Retriever", 5);
-    dogs.put(coco.getId(), coco);
+    dogMapping.put(coco.getId(), coco);
   }
 
   private void getAll(RoutingContext routingContext) {
     routingContext.response()
       .putHeader("content-type", "application/json; charset=utf-8")
-      .end(Json.encodePrettily(dogs.values()));
+      .end(Json.encodePrettily(dogMapping.values()));
+  }
+
+  private void addOne(RoutingContext routingContext) {
+    final Dogs dogs = Json.decodeValue(routingContext.getBodyAsString(),
+      Dogs.class);
+    dogMapping.put(dogs.getId(), dogs);
+    routingContext.response()
+      .setStatusCode(201)
+      .putHeader("content-type", "application/json; charset=utf-8")
+      .end(Json.encodePrettily(dogs));
   }
   @Override
   public void start() {
@@ -51,6 +62,9 @@ public class MainVerticle extends AbstractVerticle {
 
     //Routes
     router.get("/api/dogs").handler(this::getAll);
+    router.route("/api/dogs").handler(BodyHandler.create());
+    router.post("/api/dogs").handler(this::addOne);
+
 
     // Create the HTTP server
     vertx.createHttpServer()
@@ -65,5 +79,4 @@ public class MainVerticle extends AbstractVerticle {
         )
       );
   }
-
 }
