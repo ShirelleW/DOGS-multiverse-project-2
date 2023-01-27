@@ -6,8 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="DOGS-multiverse-project-2" />
         <module name="DOGS" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="DOGS-multiverse-project-2" target="11" />
+    </bytecodeTargetLevel>
   </component>
 </project>
