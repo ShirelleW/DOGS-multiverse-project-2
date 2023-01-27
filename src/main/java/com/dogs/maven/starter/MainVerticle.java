@@ -1,23 +1,33 @@
 package com.dogs.maven.starter;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Promise;
+import io.vertx.mysqlclient.MySQLConnectOptions;
+import io.vertx.sqlclient.PoolOptions;
+import io.vertx.sqlclient.SqlClient;
+import io.vertx.mysqlclient.MySQLPool;
+import io.vertx.ext.web.Router;
 
 public class MainVerticle extends AbstractVerticle {
 
   @Override
-  public void start(Promise<Void> startPromise) throws Exception {
-    vertx.createHttpServer().requestHandler(req -> {
-      req.response()
-        .putHeader("content-type", "text/plain")
-        .end("Hello from Vert.x!");
-    }).listen(8888, http -> {
-      if (http.succeeded()) {
-        startPromise.complete();
-        System.out.println("HTTP server started on port 8888");
-      } else {
-        startPromise.fail(http.cause());
-      }
-    });
+  public void start() {
+    MySQLConnectOptions connectOptions = new MySQLConnectOptions()
+      .setPort(3306)
+      .setHost("the-host")
+      .setDatabase("Dogs")
+      .setUser("root")
+      .setPassword("password123");
+
+
+    PoolOptions poolOptions = new PoolOptions()
+      .setMaxSize(5);
+
+    // Create the client pool
+    SqlClient client = MySQLPool.client(connectOptions, poolOptions);
+
+
+    // Router
+    Router router = Router.router(vertx);
+
   }
 }
