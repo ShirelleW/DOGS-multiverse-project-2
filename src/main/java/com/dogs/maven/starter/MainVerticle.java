@@ -40,6 +40,18 @@ public class MainVerticle extends AbstractVerticle {
       .putHeader("content-type", "application/json; charset=utf-8")
       .end(Json.encodePrettily(dogs));
   }
+
+  private void deleteOne(RoutingContext routingContext) {
+    String id = routingContext.request().getParam("id");
+    if (id == null) {
+      routingContext.response().setStatusCode(400).end();
+    } else {
+      Integer idAsInteger = Integer.valueOf(id);
+      dogMapping.remove(idAsInteger);
+    }
+    routingContext.response().setStatusCode(204).end();
+  }
+
   @Override
   public void start() {
 //    MySQLConnectOptions connectOptions = new MySQLConnectOptions()
@@ -64,7 +76,7 @@ public class MainVerticle extends AbstractVerticle {
     router.get("/api/dogs").handler(this::getAll);
     router.route("/api/dogs").handler(BodyHandler.create());
     router.post("/api/dogs").handler(this::addOne);
-
+    router.delete("/api/dogs/:id").handler((this::deleteOne));
 
     // Create the HTTP server
     vertx.createHttpServer()
