@@ -1,6 +1,7 @@
 package com.dogs.maven.starter;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.json.JsonObject;
 import io.vertx.mysqlclient.MySQLConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
 import io.vertx.sqlclient.SqlClient;
@@ -16,6 +17,7 @@ public class MainVerticle extends AbstractVerticle {
 
   // Store our Dogs
   private Map<Integer, Dogs> dogMapping = new LinkedHashMap<>();
+
   // Create some Dog
   private void createSomeData() {
     Dogs molly = new Dogs("Molly", "Cairn Terrier", 2);
@@ -41,19 +43,41 @@ public class MainVerticle extends AbstractVerticle {
       .end(Json.encodePrettily(dogs));
   }
 
-  private void deleteOne(RoutingContext routingContext) {
-    String id = routingContext.request().getParam("id");
-    if (id == null) {
+  private void updateOne(RoutingContext routingContext) {
+    final String id = routingContext.request().getParam("id");
+//    RequestBody resBody = routingContext.body();
+    JsonObject json = routingContext.body().asJsonObject();
+    if (id == null || json == null) {
       routingContext.response().setStatusCode(400).end();
     } else {
-      Integer idAsInteger = Integer.valueOf(id);
-      dogMapping.remove(idAsInteger);
+      final Integer idAsInteger = Integer.valueOf(id);
+      Dogs dog = dogMapping.get(idAsInteger);
+      if (dog == null) {
+        routingContext.response().setStatusCode(404).end();
+      } else {
+        dog.setName(json.getString("name"));
+        dog.setBreed(json.getString("breed"));
+        dog.setAge(json.getInteger("age"));
+        routingContext.response()
+          .putHeader("content-type", "application/json; charset=utf-8")
+          .end(Json.encodePrettily(dog));
+      }
     }
-    routingContext.response().setStatusCode(204).end();
   }
 
-  @Override
-  public void start() {
+    private void deleteOne (RoutingContext routingContext){
+      String id = routingContext.request().getParam("id");
+      if (id == null) {
+        routingContext.response().setStatusCode(400).end();
+      } else {
+        Integer idAsInteger = Integer.valueOf(id);
+        dogMapping.remove(idAsInteger);
+      }
+      routingContext.response().setStatusCode(204).end();
+    }
+
+    @Override
+    public void start () {
 //    MySQLConnectOptions connectOptions = new MySQLConnectOptions()
 //      .setPort(3306)
 //      .setHost("the-host")
@@ -68,27 +92,29 @@ public class MainVerticle extends AbstractVerticle {
 //    // Create the client pool
 //    SqlClient client = MySQLPool.client(connectOptions, poolOptions);
 
-    createSomeData();
-    // Router
-    Router router = Router.router(vertx);
+      createSomeData();
+      // Router
+      Router router = Router.router(vertx);
 
-    //Routes
-    router.get("/api/dogs").handler(this::getAll);
-    router.route("/api/dogs").handler(BodyHandler.create());
-    router.post("/api/dogs").handler(this::addOne);
-    router.delete("/api/dogs/:id").handler((this::deleteOne));
+      //Routes
+      router.get("/api/dogs").handler(this::getAll);
+      router.route("/api/dogs").handler(BodyHandler.create());
+      router.post("/api/dogs").handler(this::addOne);
+      router.put("/api/dog/:id").handler(this::updateOne);
+      router.delete("/api/dogs/:id").handler((this::deleteOne));
 
-    // Create the HTTP server
-    vertx.createHttpServer()
-      // Handle every request using the router
-      .requestHandler(router)
-      // Start listening
-      .listen(8888)
-      // Print the port
-      .onSuccess(server ->
-        System.out.println(
-          "HTTP server started on port " + server.actualPort()
-        )
-      );
+      // Create the HTTP server
+      vertx.createHttpServer()
+        // Handle every request using the router
+        .requestHandler(router)
+        // Start listening
+        .listen(8888)
+        // Print the port
+        .onSuccess(server ->
+          System.out.println(
+            "HTTP server started on port " + server.actualPort()
+          )
+        );
+    }
   }
-}
+
