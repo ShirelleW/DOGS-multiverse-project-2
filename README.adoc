@@ -1,31 +1,17 @@
-= Starter
+# Back-end collaboration project
 
-image:https://img.shields.io/badge/vert.x-4.3.7-purple.svg[link="https://vertx.io"]
+## Technologies used for this project:
+- Java
+- Vertx
 
-This application was generated using http://start.vertx.io
+## Gained Knowledge:
+- Learned how to work with vertx
+- Learned how to code in Java/back-end Java
 
-== Building
 
-To launch your tests:
-```
-./mvnw clean test
-```
-
-To package your application:
-```
-./mvnw clean package
-```
-
-To run your application:
-```
-./mvnw clean compile exec:java
-```
-
-== Help
-
-* https://vertx.io/docs/[Vert.x Documentation]
-* https://stackoverflow.com/questions/tagged/vert.x?sort=newest&pageSize=15[Vert.x Stack Overflow]
-* https://groups.google.com/forum/?fromgroups#!forum/vertx[Vert.x User Group]
-* https://gitter.im/eclipse-vertx/vertx-users[Vert.x Gitter]
+## Job Functions:
+- JF 5.5 - Understands and can apply structured techniques to problem solving, can debug code and can understand the structure of programmes to identify and resolve issues.
+- JF 6.1 - Knows how best to communicate using different communication methods and how to adapt appropriately to different audiences.
+- JF 6.6 - Shows initiative for solving problems within their own remit, being resourceful when faced with a problem to solve.
 
 
